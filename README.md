@@ -26,7 +26,7 @@ Options:
 ### Non-features: 
 - Utf8 is the only supported serial encoding.
 
-### Build
+### Build it yourself
 Dependencies:  
 - `cargo` with min rust `1.56.1`
 - Packages (**linux only**):
@@ -36,3 +36,6 @@ Dependencies:
 
 Build the program with `cargo build --release`. 
 The executable file will be stored under `target\release\`  as a file called `serial-pipe.exe` (windows) or just `serial-pipe` (linux).
+
+### Binaries
+Please express interest if you would like prebuilt binaries to become available
