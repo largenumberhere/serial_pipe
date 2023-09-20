@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.4.4", features = ["derive"] }
 serialport = {version = "4.2.2", features = ["default"]}
+utf8-read = "0.4.0"
