@@ -26,6 +26,13 @@ Options:
 ### Non-features: 
 - Utf8 is the only supported serial encoding.
 
+### Install
+To build and install this, you will need the dependencies listed under [build it yourself](#build-it-yourself).
+Once, you have them, you can just run the command bellow.
+```
+cargo install --git https://github.com/largenumberhere/serial_pipe
+```
+
 ### Build it yourself
 Dependencies:  
 - `cargo` with min rust `1.56.1`
