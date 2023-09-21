@@ -1,11 +1,15 @@
 
 
-use std::io::{Error, ErrorKind, Read, Write};
+use std::io::{Error, Read, Write};
+
 use std::process::exit;
 use std::time::Duration;
 use serialport::SerialPort;
 
 use clap::{Parser, command, arg};
+
+type IOErrorKind = std::io::ErrorKind;
+type SerialErrorKind = serialport::ErrorKind;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -30,7 +34,22 @@ fn main() {
     let mut serial = match serial.open() {
         Ok(v) => {v}
         Err(e) => {
-            eprint!("Failed to open serial port '{}' Perhaps it's being used by another application? {:?}", &args.port , e);
+            match e.kind {
+                SerialErrorKind::NoDevice => {
+                    eprintln!("No device was found for port '{}'",&args.port);
+                    exit(-1);
+                }
+                SerialErrorKind::InvalidInput => {
+                    eprintln!("'{}' is not valid input", &args.port);
+                }
+                SerialErrorKind::Unknown => {
+                    eprintln!("Unknown error opening port");
+                }
+                SerialErrorKind::Io(ioe) => {
+                    eprintln!("IoError encountered when opening port {:?}", ioe);
+                }
+            }
+
             exit(-1);
         }
     };
@@ -45,7 +64,7 @@ fn read(serial: &mut Box<dyn SerialPort>, timeout: Option<u64>) {
 
     // Stops reads from blocking eternally.
     // Timeouts are ignored, this is the most efficient way to avoid polling with breaks and instead relying on the os' updates with occasional breaks
-    serial.set_timeout(Duration::from_millis(500)).expect("TODO: panic message");
+    serial.set_timeout(Duration::from_millis(1)).expect("TODO: panic message");
 
     let mut reader =utf8_read::Reader::new(serial);
     let mut last_time_time = std::time::Instant::now();
@@ -59,7 +78,7 @@ fn read(serial: &mut Box<dyn SerialPort>, timeout: Option<u64>) {
                 match e {
                     utf8_read::Error::IoError(ioe) => {
                         match ioe.kind() {
-                            ErrorKind::TimedOut => {
+                            IOErrorKind::TimedOut => {
                                 //Ignore read timeouts
                             }
                             _ =>{
